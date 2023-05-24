@@ -7,14 +7,34 @@ export default function App(){
   
   function handleSubmit(e){
     e.preventDefault()
-    
-    setToDos((currentTodos) => {
+
+    setToDos(currentTodos => {
       return [
-        ...todos, 
+        ...currentTodos, 
         {id : crypto.randomUUID(), 
           title: newItem, 
           completed: false}
         ]
+    })
+
+    setNewItem("")
+  }
+
+  function toggleTodo(id, completed){
+    setToDos(currentTodos => {
+      return currentTodos.map(todo => {
+        if(todo.id === id){
+          return {...todo, completed}
+        }
+
+        return todo
+      })
+    })
+  }
+
+  function deleteTodo(id){
+    setToDos(currentTodos => {
+      return currentTodos.filter(todo => todo.id != id)
     })
   }
 
@@ -26,7 +46,7 @@ export default function App(){
       <div className = "form-row">
       <label htmlFor ="item"> New Item</label>
       <input value={newItem} 
-        onChange={e => setNewItem(e.value)} 
+        onChange={e => setNewItem(e.target.value)} 
         type="text" 
         id = "item"/>
       </div>
@@ -34,21 +54,24 @@ export default function App(){
     </form>
     <h1 className="header">To do List</h1>
     <ul className="list"> 
-      <li>
-        <label>
-          <input type = "checkbox"/>
-          Item 1
-        </label>
-        <button className="btn btn-danger">Delete</button>
-      </li>
-      <li>
-        <label>
-          <input type = "checkbox"/>
-          Item 2
-        </label>
-        <button className="btn btn-danger">Delete</button>
-      </li>
-      
+      {todos.length === 0 && "No Todos"}
+      {todos.map(todo => {
+        return (
+        <li key = {todo.id}>
+          <label>
+            <input type = "checkbox" 
+            checked={todo.completed}
+            onChange={e => toggleTodo(todo.id, e.target.checked)}
+            />
+            {todo.title}
+          </label>
+          <button onClick={() => deleteTodo(todo.id)}
+          className="btn btn-danger">
+            Delete
+            </button>
+        </li>
+        )
+      })}
     </ul>
     </>
   )
